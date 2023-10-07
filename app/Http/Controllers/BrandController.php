@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
-use PhpParser\Node\Stmt\Return_;
-use Ramsey\Uuid\Type\Integer;
 
 class BrandController extends Controller
 {
@@ -23,7 +21,10 @@ class BrandController extends Controller
     public function index()
     {
         $allBrands = $this->brand->all();
-        return $allBrands;
+        if($allBrands) {
+            return response()->json($allBrands, 200);
+        }
+        return response()->json(['Nenhuma marca encontrada'], 404);
     }
 
     /**
@@ -35,7 +36,7 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $brand = $this->brand->create($request->all());
-        return $brand;
+        return response()->json($brand, 201);
     }
 
     /**
@@ -47,7 +48,10 @@ class BrandController extends Controller
     public function show(int $id)
     {
         $brand = $this->brand->find($id);
-        return $brand;
+        if($brand) {
+            return response()->json($brand, 200);
+        }
+        return response()->json(['message' => 'marca não encontrada'], 404);
     }
 
     /**
@@ -60,20 +64,26 @@ class BrandController extends Controller
     public function update(Request $request, int $id)
     {
         $brand = $this->brand->find($id);
-        $brand->update($request->all());
-        return $brand;
+        if($brand) {
+            $brand->update($request->all());
+            return response()->json($brand, 200);
+        }
+        return response()->json(['message' => 'marca não encontrada'], 404);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Brand  $brand
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(int $id)
     {
         $brand = $this->brand->find($id);
-        $brand->delete();
-        return ['message' => 'deleted'];
+        if($brand) {
+            $brand->delete();
+            return response()->json(['message' => 'deleted'], 200);
+        }
+        return response()->json(['message' => 'marca não encontrada'], 404);
     }
 }
