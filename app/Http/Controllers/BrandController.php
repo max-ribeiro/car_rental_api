@@ -15,8 +15,8 @@ class BrandController extends Controller
      */
     public function index()
     {
-        //
-        return Brand::all();
+        $allBrands = Brand::all();
+        return $allBrands;
     }
 
     /**
@@ -40,18 +40,7 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Brand  $brand
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Brand $brand)
-    {
-        //
+        return $brand;
     }
 
     /**
@@ -64,6 +53,8 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         //
+        $brand->update($request->all());
+        return $brand;
     }
 
     /**
