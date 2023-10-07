@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use PhpParser\Node\Stmt\Return_;
 
 class BrandController extends Controller
 {
@@ -15,16 +16,7 @@ class BrandController extends Controller
     public function index()
     {
         //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Brand::all();
     }
 
     /**
@@ -36,6 +28,8 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         //
+        $brand = Brand::create($request->all());
+        return $brand;
     }
 
     /**
