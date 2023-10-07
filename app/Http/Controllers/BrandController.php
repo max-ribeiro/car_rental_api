@@ -86,7 +86,22 @@ class BrandController extends Controller
                 }, ARRAY_FILTER_USE_KEY);
 
             $request->validate($rules, $this->brand->feedback());
-            $brand->update($request->all());
+            $image = $request->file('image');
+            $imagePath = $image->store('/images', 'public');
+
+            $params = [];
+            if ($imagePath) {
+                $params['image'] = $imagePath;
+            }
+
+            $name = $request->name;
+            if ($name) {
+                $params['name'] = $name;
+            }
+
+            $brand->update($params);
+
+            // $brand->update($request->all());
             return response()->json($brand, 200);
         }
         return response()->json(['message' => 'marca não encontrada'], 404);
