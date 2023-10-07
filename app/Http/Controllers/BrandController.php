@@ -5,9 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\Return_;
+use Ramsey\Uuid\Type\Integer;
 
 class BrandController extends Controller
 {
+    private $brand;
+
+    public function __construct(Brand $brand)
+    {
+        $this->brand = $brand;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +22,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $allBrands = Brand::all();
+        $allBrands = $this->brand->all();
         return $allBrands;
     }
 
@@ -27,32 +34,32 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $brand = Brand::create($request->all());
+        $brand = $this->brand->create($request->all());
         return $brand;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Brand  $brand
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Brand $brand)
+    public function show(int $id)
     {
+        $brand = $this->brand->find($id);
         return $brand;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  int $id
      * @param  \App\Models\Brand  $brand
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Brand $brand)
+    public function update(Request $request, int $id)
     {
-        //
+        $brand = $this->brand->find($id);
         $brand->update($request->all());
         return $brand;
     }
@@ -63,9 +70,9 @@ class BrandController extends Controller
      * @param  \App\Models\Brand  $brand
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Brand $brand)
+    public function destroy(int $id)
     {
-        //
+        $brand = $this->brand->find($id);
         $brand->delete();
         return ['message' => 'deleted'];
     }
