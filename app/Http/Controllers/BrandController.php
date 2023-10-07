@@ -67,9 +67,15 @@ class BrandController extends Controller
     public function update(Request $request, int $id)
     {
         $brand = $this->brand->find($id);
-        $request->validate($this->brand->rules(), $this->brand->feedback());
 
         if($brand) {
+            $defaultRules = $this->brand->rules();
+            $requestParams = $request->all();
+            $rules = 'PUT' === $request->method() ? $defaultRules : array_filter($defaultRules , function($key) use ($requestParams) {
+                return array_key_exists($key, $requestParams);
+            }, ARRAY_FILTER_USE_KEY);
+
+            $request->validate($rules, $this->brand->feedback());
             $brand->update($request->all());
             return response()->json($brand, 200);
         }
