@@ -38,7 +38,15 @@ class BrandController extends Controller
 
         $request->validate($this->brand->rules(), $this->brand->feedback());
 
-        $brand = $this->brand->create($request->all());
+        $image = $request->file('image');
+        $imagePath = $image->store('images', 'public');
+
+        // $brand = $this->brand->create($request->all());
+        $brand = $this->brand->create([
+            'name' => $request->get('name'),
+            'image' => $imagePath
+        ]);
+
         return response()->json($brand, 201);
     }
 
@@ -71,9 +79,11 @@ class BrandController extends Controller
         if($brand) {
             $defaultRules = $this->brand->rules();
             $requestParams = $request->all();
-            $rules = 'PUT' === $request->method() ? $defaultRules : array_filter($defaultRules , function($key) use ($requestParams) {
-                return array_key_exists($key, $requestParams);
-            }, ARRAY_FILTER_USE_KEY);
+            $rules = 'PUT' === $request->method()
+                ? $defaultRules
+                : array_filter($defaultRules , function($key) use ($requestParams) {
+                    return array_key_exists($key, $requestParams);
+                }, ARRAY_FILTER_USE_KEY);
 
             $request->validate($rules, $this->brand->feedback());
             $brand->update($request->all());

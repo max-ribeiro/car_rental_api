@@ -12,7 +12,7 @@ class Brand extends Model
     public function rules () {
         return [
             'name' => 'required|unique:brands,name|min:3',
-            'image' => 'required'
+            'image' => 'required|file|mime:png'
         ];
     }
     public function feedback () {
