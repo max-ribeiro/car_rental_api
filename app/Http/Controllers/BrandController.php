@@ -35,6 +35,9 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate($this->brand->rules(), $this->brand->feedback());
+
         $brand = $this->brand->create($request->all());
         return response()->json($brand, 201);
     }
@@ -64,6 +67,8 @@ class BrandController extends Controller
     public function update(Request $request, int $id)
     {
         $brand = $this->brand->find($id);
+        $request->validate($this->brand->rules(), $this->brand->feedback());
+
         if($brand) {
             $brand->update($request->all());
             return response()->json($brand, 200);
