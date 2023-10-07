@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  laravelMysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: car_rental
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 33061:3306
+volumes:
+  mysql_data:
