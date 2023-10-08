@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\CarModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CarModelController extends Controller
 {
+    private CarModel $carModel;
+    public function __construct(CarModel $carModel)
+    {
+        $this->carModel = $carModel;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +20,8 @@ class CarModelController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $carModels = $this->carModel->all();
+        return response()->json($carModels, 200);
     }
 
     /**
@@ -36,6 +33,14 @@ class CarModelController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate($this->carModel->rules());
+        $params = $request->all();
+
+        $image = $request->file('image');
+        $params['image'] = $image->store('images', 'public');
+
+        $carModel = $this->carModel->create($params);
+        return response()->json($carModel, 200);
     }
 
     /**
@@ -44,20 +49,15 @@ class CarModelController extends Controller
      * @param  \App\Models\CarModel  $carModel
      * @return \Illuminate\Http\Response
      */
-    public function show(CarModel $carModel)
+    public function show(int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\CarModel  $carModel
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CarModel $carModel)
-    {
-        //
+        $carModel = $this->carModel->find($id);
+        if($carModel) {
+            return response()->json($carModel, 200);
+        }
+        return response([
+            'error' => 'Modelo não existe'
+        ], 400);
     }
 
     /**
@@ -67,9 +67,36 @@ class CarModelController extends Controller
      * @param  \App\Models\CarModel  $carModel
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CarModel $carModel)
+    public function update(Request $request, int $id)
     {
-        //
+        $carModel = $this->carModel->find($id);
+        if($carModel) {
+            $params = $request->all();
+            $defaultRules = $this->carModel->rules();
+
+            $rules = 'PUT' === $request->method()
+                ? $defaultRules
+                : array_filter($defaultRules , function($key) use ($params) {
+                    return array_key_exists($key, $params);
+                }, ARRAY_FILTER_USE_KEY);
+
+            $request->validate($rules);
+
+            $image = $request->file('image');
+            $imagePath = $image->store('images', 'public');
+
+            if ($imagePath) {
+                if ($carModel->image) {
+                    Storage::disk('public')->delete($carModel->image);
+                }
+                $params['image'] = $imagePath;
+            }
+
+            $carModel = $carModel->update($params);
+            return response($carModel, 200);
+        }
+        return response()->json(['message' => 'modelo não encontrada'], 404);
+
     }
 
     /**
@@ -78,8 +105,16 @@ class CarModelController extends Controller
      * @param  \App\Models\CarModel  $carModel
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CarModel $carModel)
+    public function destroy(int $id)
     {
-        //
+        $carModel = $this->carModel->find($id);
+        if($carModel) {
+            if ($carModel->image) {
+                Storage::disk('public')->delete($carModel->image);
+            }
+            $carModel->delete();
+            return response()->json(['message' => 'deleted'], 200);
+        }
+        return response()->json(['message' => 'modelo não encontrada'], 404);
     }
 }
