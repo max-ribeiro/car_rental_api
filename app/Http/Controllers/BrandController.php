@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
@@ -91,6 +92,9 @@ class BrandController extends Controller
 
             $params = [];
             if ($imagePath) {
+                if ($brand->image) {
+                    Storage::disk('public')->delete($brand->image);
+                }
                 $params['image'] = $imagePath;
             }
 
@@ -117,6 +121,9 @@ class BrandController extends Controller
     {
         $brand = $this->brand->find($id);
         if($brand) {
+            if ($brand->image) {
+                Storage::disk('public')->delete($brand->image);
+            }
             $brand->delete();
             return response()->json(['message' => 'deleted'], 200);
         }
