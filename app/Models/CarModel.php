@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Brand;
 
 class CarModel extends Model
 {
@@ -11,7 +12,7 @@ class CarModel extends Model
     protected $fillable = [
         'brand_id',
         'name',
-        'iamge',
+        'image',
         'doors',
         'seats',
         'air_bag',
@@ -26,7 +27,11 @@ class CarModel extends Model
             'doors' => 'required|integer|digits_between:1,5',
             'seats' => 'required|integer|digits_between:1,20',
             'air_bag' => 'required|boolean',
-            'abs' => 'requires|boolean'
+            'abs' => 'required|boolean'
         ];
+    }
+
+    public function brand() {
+        return $this->belongsTo(Brand::class);
     }
 }

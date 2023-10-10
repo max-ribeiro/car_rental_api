@@ -37,7 +37,7 @@ class CarModelController extends Controller
         $params = $request->all();
 
         $image = $request->file('image');
-        $params['image'] = $image->store('images', 'public');
+        $params['image'] = $image->store('images/models', 'public');
 
         $carModel = $this->carModel->create($params);
         return response()->json($carModel, 200);
@@ -51,7 +51,7 @@ class CarModelController extends Controller
      */
     public function show(int $id)
     {
-        $carModel = $this->carModel->find($id);
+        $carModel = $this->carModel->with('brand')->find($id);
         if($carModel) {
             return response()->json($carModel, 200);
         }
@@ -83,7 +83,7 @@ class CarModelController extends Controller
             $request->validate($rules);
 
             $image = $request->file('image');
-            $imagePath = $image->store('images', 'public');
+            $imagePath = $image->store('images/models', 'public');
 
             if ($imagePath) {
                 if ($carModel->image) {

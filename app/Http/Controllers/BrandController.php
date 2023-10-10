@@ -59,7 +59,7 @@ class BrandController extends Controller
      */
     public function show(int $id)
     {
-        $brand = $this->brand->find($id);
+        $brand = $this->brand->with('carmodels')->find($id);
         if($brand) {
             return response()->json($brand, 200);
         }
