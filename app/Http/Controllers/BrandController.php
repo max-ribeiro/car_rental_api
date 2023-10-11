@@ -40,7 +40,7 @@ class BrandController extends Controller
         $request->validate($this->brand->rules(), $this->brand->feedback());
 
         $image = $request->file('image');
-        $imagePath = $image->store('images', 'public');
+        $imagePath = $image->store('images/logos', 'public');
 
         // $brand = $this->brand->create($request->all());
         $brand = $this->brand->create([
@@ -79,23 +79,24 @@ class BrandController extends Controller
 
         if($brand) {
             $defaultRules = $this->brand->rules();
-            $requestParams = $request->all();
+            $params = $request->all();
             $rules = 'PUT' === $request->method()
                 ? $defaultRules
-                : array_filter($defaultRules , function($key) use ($requestParams) {
-                    return array_key_exists($key, $requestParams);
+                : array_filter($defaultRules , function($key) use ($params) {
+                    return array_key_exists($key, $params);
                 }, ARRAY_FILTER_USE_KEY);
 
             $request->validate($rules, $this->brand->feedback());
 
-            $brand->fill($requestParams);
-
             $image = $request->file('image');
             if($image) {
                 Storage::disk('public')->delete($brand->image);
-                $imagePath = $image->store('/images', 'public');
-                $brand->image = $imagePath;
+                $imagePath = $image->store('images/logos', 'public');
+                $params['image'] = $imagePath;
             }
+
+            $brand->fill($params);
+
             $brand->save();
 
             // $brand->update($request->all());

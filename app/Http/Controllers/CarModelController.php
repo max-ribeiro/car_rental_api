@@ -81,15 +81,15 @@ class CarModelController extends Controller
                 }, ARRAY_FILTER_USE_KEY);
 
             $request->validate($rules);
-            $carModel->fill($params);
 
             $image = $request->file('image');
             if($image) {
                 Storage::disk('public')->delete($carModel->image);
                 $imagePath = $image->store('images/models', 'public');
-                $carModel->image = $imagePath;
+                $params['image'] = $imagePath;
             }
 
+            $carModel->fill($params);
             $carModel = $carModel->save();
             return response($carModel, 200);
         }
