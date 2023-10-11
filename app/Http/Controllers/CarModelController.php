@@ -20,7 +20,7 @@ class CarModelController extends Controller
      */
     public function index()
     {
-        $carModels = $this->carModel->all();
+        $carModels = $this->carModel->with('brand')->get();
         return response()->json($carModels, 200);
     }
 
@@ -81,18 +81,16 @@ class CarModelController extends Controller
                 }, ARRAY_FILTER_USE_KEY);
 
             $request->validate($rules);
+            $carModel->fill($params);
 
             $image = $request->file('image');
-            $imagePath = $image->store('images/models', 'public');
-
-            if ($imagePath) {
-                if ($carModel->image) {
-                    Storage::disk('public')->delete($carModel->image);
-                }
-                $params['image'] = $imagePath;
+            if($image) {
+                Storage::disk('public')->delete($carModel->image);
+                $imagePath = $image->store('images/models', 'public');
+                $carModel->image = $imagePath;
             }
 
-            $carModel = $carModel->update($params);
+            $carModel = $carModel->save();
             return response($carModel, 200);
         }
         return response()->json(['message' => 'modelo não encontrada'], 404);

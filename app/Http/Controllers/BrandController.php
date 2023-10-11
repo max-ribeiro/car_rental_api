@@ -21,7 +21,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $allBrands = $this->brand->all();
+        $allBrands = $this->brand->with('carmodels')->get();
         if($allBrands) {
             return response()->json($allBrands, 200);
         }
@@ -87,23 +87,16 @@ class BrandController extends Controller
                 }, ARRAY_FILTER_USE_KEY);
 
             $request->validate($rules, $this->brand->feedback());
+
+            $brand->fill($requestParams);
+
             $image = $request->file('image');
-            $imagePath = $image->store('/images', 'public');
-
-            $params = [];
-            if ($imagePath) {
-                if ($brand->image) {
-                    Storage::disk('public')->delete($brand->image);
-                }
-                $params['image'] = $imagePath;
+            if($image) {
+                Storage::disk('public')->delete($brand->image);
+                $imagePath = $image->store('/images', 'public');
+                $brand->image = $imagePath;
             }
-
-            $name = $request->name;
-            if ($name) {
-                $params['name'] = $name;
-            }
-
-            $brand->update($params);
+            $brand->save();
 
             // $brand->update($request->all());
             return response()->json($brand, 200);
