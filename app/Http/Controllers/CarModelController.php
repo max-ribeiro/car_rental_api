@@ -21,11 +21,17 @@ class CarModelController extends Controller
     public function index(Request $request)
     {
         $models = [];
+        if($request->has('brandParams')) {
+            $brandParams = $request->brandParams;
+            $models = $this->carModel->with('brand:id,'.$brandParams);
+        } else {
+            $models = $this->carModel->with('brand');
+        }
         if($request->has('params')) {
             $attributes = $request->params;
-            $models = $this->carModel->selectRaw($attributes)->get();
+            $models = $models->selectRaw($attributes)->get();
         } else {
-            $models = $this->carModel->with('brand')->get();
+            $models = $models->get();
         }
         return response()->json($models, 200);
     }
