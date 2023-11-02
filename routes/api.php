@@ -27,4 +27,4 @@ Route::apiResource('brand', BrandController::class);
 Route::apiResource('car', CarController::class);
 Route::apiResource('model', CarModelController::class);
 Route::apiResource('client', ClientController::class);
-Route::apiResource('Rental', RentalController::class);
+Route::apiResource('rental', RentalController::class);
