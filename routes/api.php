@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CarModelController;
@@ -28,3 +29,8 @@ Route::apiResource('car', CarController::class);
 Route::apiResource('model', CarModelController::class);
 Route::apiResource('client', ClientController::class);
 Route::apiResource('rental', RentalController::class);
+
+Route::post('login', AuthController::class.'@login');
+Route::post('logout', AuthController::class.'@logout');
+Route::post('refresh', AuthController::class.'@refresh');
+Route::post('me', AuthController::class.'@me');
