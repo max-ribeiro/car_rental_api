@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CarModel;
+use App\Repositories\CarModelRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -20,27 +21,20 @@ class CarModelController extends Controller
      */
     public function index(Request $request)
     {
-        $models = [];
+        $carModelRepository = new CarModelRepository($this->carModel);
+
         if($request->has('brandParams')) {
-            $brandParams = $request->brandParams;
-            $models = $this->carModel->with('brand:id,'.$brandParams);
+            $carModelRepository->setRelatedRecordsParams('brand:id,'.$request->brandParams);
         } else {
-            $models = $this->carModel->with('brand');
+            $carModelRepository->setRelatedRecordsParams('brand');
         }
         if($request->has('filters')) {
-            $filters = explode(';', $request->filters);
-            foreach($filters as $filter) {
-                $filter = explode(':', $filter);
-                $models = $models->where($filter[0], $filter[1], $filter[2]);
-            }
+            $carModelRepository->setFilters($request->filters);
         }
         if($request->has('params')) {
-            $attributes = $request->params;
-            $models = $models->selectRaw($attributes)->get();
-        } else {
-            $models = $models->get();
+            $carModelRepository->setParams($request->params);
         }
-        return response()->json($models, 200);
+        return response()->json($carModelRepository->get(), 200);
     }
 
     /**

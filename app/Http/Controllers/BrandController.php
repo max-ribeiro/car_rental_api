@@ -24,7 +24,6 @@ class BrandController extends Controller
     {
         $brandRepository = new BrandRepository($this->brand);
 
-        $brands = [];
         if($request->has('model_params')) {
             $brandRepository->setRelatedRecordsParams('carModels:id'.$request->brandParams);
         } else {
