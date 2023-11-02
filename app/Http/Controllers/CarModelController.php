@@ -27,6 +27,10 @@ class CarModelController extends Controller
         } else {
             $models = $this->carModel->with('brand');
         }
+        if($request->has('filters')) {
+            $filters = explode(':', $request->filters);
+            $models = $models->where($filters[0], $filters[1], $filters[2]);
+        }
         if($request->has('params')) {
             $attributes = $request->params;
             $models = $models->selectRaw($attributes)->get();
