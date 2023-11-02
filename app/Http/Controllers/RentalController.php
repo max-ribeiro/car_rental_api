@@ -6,8 +6,15 @@ use App\Http\Requests\StoreRentalRequest;
 use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Rental;
 
+use App\Repositories\RentalRepository;
+
 class RentalController extends Controller
 {
+    private $rental;
+    public function __construct(Rental $rental)
+    {
+        $this->rental = $rental;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -16,6 +23,7 @@ class RentalController extends Controller
     public function index()
     {
         //
+        $rentalRepository = new RentalRepository($this->rental);
     }
 
     /**

@@ -13,7 +13,7 @@ class AbstractRepository {
         $this->model = $model;
     }
     /**
-     * Return entity the records
+     * Return the entity records
      *
      * @return Collection
      */

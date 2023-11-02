@@ -5,27 +5,33 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Repositories\ClientRepository;
+use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+    private $client;
+
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
+    }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $clientRepository = new ClientRepository($this->client);
+        if($request->has('filters')) {
+            $clientRepository->setFilters($request->filters);
+        }
+        if($request->has('params')) {
+            $clientRepository->setParams($request->params);
+        }
+        return response()->json($clientRepository->get(), 200);
     }
 
     /**
@@ -34,9 +40,18 @@ class ClientController extends Controller
      * @param  \App\Http\Requests\StoreClientRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreClientRequest $request)
+    public function store(Request $request)
     {
         //
+        $request->validate($this->client->rules());
+
+
+        // $client = $this->client->create($request->all());
+        $client = $this->client->create([
+            'name' => $request->get('name'),
+        ]);
+
+        return response()->json($client, 201);
     }
 
     /**
@@ -45,20 +60,13 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function show(Client $client)
+    public function show(int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Client  $client
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Client $client)
-    {
-        //
+        $client = $this->client->find($id);
+        if($client) {
+            return response()->json($client, 200);
+        }
+        return response()->json(['message' => 'marca não encontrada'], 404);
     }
 
     /**
@@ -68,9 +76,29 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(Request $request, int $id)
     {
-        //
+        $car = $this->client->find($id);
+
+        if($client) {
+            $defaultRules = $this->client->rules();
+            $params = $request->all();
+            $rules = 'PUT' === $request->method()
+                ? $defaultRules
+                : array_filter($defaultRules , function($key) use ($params) {
+                    return array_key_exists($key, $params);
+                }, ARRAY_FILTER_USE_KEY);
+
+            $request->validate($rules);
+
+            $car->fill($params);
+
+            $car->save();
+
+            // $car->update($request->all());
+            return response()->json($car, 200);
+        }
+        return response()->json(['message' => 'cliente não encontrado'], 404);
     }
 
     /**
@@ -79,8 +107,13 @@ class ClientController extends Controller
      * @param  \App\Models\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Client $client)
+    public function destroy(int $id)
     {
-        //
+        $client = $this->client->find($id);
+        if($client) {
+            $client->delete();
+            return response()->json(['message' => 'deleted'], 200);
+        }
+        return response()->json(['message' => 'cliente não encontrado'], 404);
     }
 }

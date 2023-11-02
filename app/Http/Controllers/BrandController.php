@@ -24,8 +24,8 @@ class BrandController extends Controller
     {
         $brandRepository = new BrandRepository($this->brand);
 
-        if($request->has('model_params')) {
-            $brandRepository->setRelatedRecordsParams('carModels:id'.$request->brandParams);
+        if($request->has('modelParams')) {
+            $brandRepository->setRelatedRecordsParams('carModels:id'.$request->modelParams);
         } else {
             $brandRepository->setRelatedRecordsParams('carModels');
         }
@@ -70,7 +70,7 @@ class BrandController extends Controller
      */
     public function show(int $id)
     {
-        $brand = $this->brand->with('carmodels')->find($id);
+        $brand = $this->brand->with('carModels')->find($id);
         if($brand) {
             return response()->json($brand, 200);
         }
