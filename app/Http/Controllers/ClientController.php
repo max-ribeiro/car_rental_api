@@ -78,7 +78,7 @@ class ClientController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $car = $this->client->find($id);
+        $client = $this->client->find($id);
 
         if($client) {
             $defaultRules = $this->client->rules();
@@ -91,12 +91,12 @@ class ClientController extends Controller
 
             $request->validate($rules);
 
-            $car->fill($params);
+            $client->fill($params);
 
-            $car->save();
+            $client->save();
 
-            // $car->update($request->all());
-            return response()->json($car, 200);
+            // $client->update($request->all());
+            return response()->json($client, 200);
         }
         return response()->json(['message' => 'cliente não encontrado'], 404);
     }

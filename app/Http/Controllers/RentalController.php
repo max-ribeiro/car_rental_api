@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateRentalRequest;
 use App\Models\Rental;
 
 use App\Repositories\RentalRepository;
+use Illuminate\Http\Request;
 
 class RentalController extends Controller
 {
@@ -20,20 +21,17 @@ class RentalController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
         $rentalRepository = new RentalRepository($this->rental);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        if($request->has('params')) {
+            $rentalRepository->setParams($request->params);
+        }
+        if($request->has('filters')) {
+            $rentalRepository->setFilters($request->filters);
+        }
+        return response()->json($rentalRepository->get(), 200);
     }
 
     /**
@@ -44,7 +42,22 @@ class RentalController extends Controller
      */
     public function store(StoreRentalRequest $request)
     {
-        //
+        $request->validate($this->rental->rules());
+
+
+        // $rental = $this->rental->create($request->all());
+        $rental = $this->rental->create([
+            'client_id' => $request->client_id,
+            'car_id' => $request->car_id,
+            'pickup' => $request->pickup,
+            'dropoff' => $request->dropoff,
+            'return_date' => $request->return_date,
+            'daily_price' => $request->daily_price,
+            'initial_km' => $request->initial_km,
+            'final_km' => $request->final_km
+        ]);
+
+        return response()->json($rental, 201);
     }
 
     /**
@@ -53,20 +66,13 @@ class RentalController extends Controller
      * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function show(Rental $rental)
+    public function show(int $id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Rental  $rental
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Rental $rental)
-    {
-        //
+        $rental = $this->rental->find($id);
+        if($rental) {
+            return response()->json($rental, 200);
+        }
+        return response()->json(['message' => 'marca não encontrada'], 404);
     }
 
     /**
@@ -76,9 +82,29 @@ class RentalController extends Controller
      * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateRentalRequest $request, Rental $rental)
+    public function update(UpdateRentalRequest $request, int $id)
     {
-        //
+        $rental = $this->rental->find($id);
+
+        if($rental) {
+            $defaultRules = $this->rental->rules();
+            $params = $request->all();
+            $rules = 'PUT' === $request->method()
+                ? $defaultRules
+                : array_filter($defaultRules , function($key) use ($params) {
+                    return array_key_exists($key, $params);
+                }, ARRAY_FILTER_USE_KEY);
+
+            $request->validate($rules);
+
+            $rental->fill($params);
+
+            $rental->save();
+
+            // $rental->update($request->all());
+            return response()->json($rental, 200);
+        }
+        return response()->json(['message' => 'locação não encontrada'], 404);
     }
 
     /**
@@ -87,8 +113,13 @@ class RentalController extends Controller
      * @param  \App\Models\Rental  $rental
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Rental $rental)
+    public function destroy(int $id)
     {
-        //
+        $rental = $this->rental->find($id);
+        if($rental) {
+            $rental->delete();
+            return response()->json(['message' => 'deleted'], 200);
+        }
+        return response()->json(['message' => 'locação não encontrada'], 404);
     }
 }

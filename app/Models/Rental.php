@@ -9,18 +9,9 @@ class Rental extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['client_id', 'car_model_id', 'pickup', 'dropoff', 'return_date', 'daily_price', 'initial_km', 'final_km'];
+    protected $fillable = ['client_id', 'car_id', 'pickup', 'dropoff', 'return_date', 'daily_price', 'initial_km', 'final_km'];
 
     public function rules() {
-        return [
-            'client_id' => '',
-            'car_model_id' => '',
-            'pickup' => '',
-            'dropoff' => '',
-            'return_date' => '',
-            'daily_price' => '',
-            'initial_km' => '',
-            'final_km' => ''
-        ];
+        return [];
     }
 }
