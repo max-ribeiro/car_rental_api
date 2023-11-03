@@ -34,8 +34,8 @@ Route::prefix('v1')->middleware('jwt.auth')->group(function() {
     Route::group([], function() {
         Route::post('me', AuthController::class.'@me');
         Route::post('refresh', AuthController::class.'@refresh');
+        Route::post('logout', AuthController::class.'@logout');
     });
 });
 
 Route::post('login', AuthController::class.'@login');
-Route::post('logout', AuthController::class.'@logout');
