@@ -30,9 +30,12 @@ Route::prefix('v1')->middleware('jwt.auth')->group(function() {
     Route::apiResource('model', CarModelController::class);
     Route::apiResource('client', ClientController::class);
     Route::apiResource('rental', RentalController::class);
-    Route::post('me', AuthController::class.'@me');
+    //token controllers
+    Route::group([], function() {
+        Route::post('me', AuthController::class.'@me');
+        Route::post('refresh', AuthController::class.'@refresh');
+    });
 });
 
 Route::post('login', AuthController::class.'@login');
 Route::post('logout', AuthController::class.'@logout');
-Route::post('refresh', AuthController::class.'@refresh');
